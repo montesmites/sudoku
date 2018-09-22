@@ -7,14 +7,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 import static java.util.stream.Stream.generate;
 
-class Grid {
-    static Grid of(List<String> rows) {
+public class Grid {
+    public static Grid of(List<String> rows) {
         var order = (int) Math.sqrt(rows.size());
         var side = rows.size();
         var area = side * side;
@@ -79,10 +78,8 @@ class Grid {
         final var neighbourhood = new Neighbourhood(context.getOrder());
         final var neighbours = BitVector.of(context.getArea(), neighbourhood.neighbourhoodOf(index));
         return range(0, context.getSide())
-                .mapToObj(i -> candidates.stream()
-                                         .filter(candidate -> candidate.and(neighbours).isEmpty())
-                                         .map(__ -> i))
-                .flatMap(identity())
+                .filter(i -> candidates.get(i).and(neighbours).isEmpty())
+                .boxed()
                 .collect(toList());
     }
 

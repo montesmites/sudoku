@@ -24,17 +24,15 @@ class Sudoku {
                 }
                 return solve(gridCopy);
             } else {
-                var candidate = candidateCount.entrySet().stream().findFirst();
-                if (candidate.isPresent()) {
-                    var candidateEntry = candidate.get().getValue().stream().findFirst();
-                    if (candidateEntry.isPresent()) {
-                        var entry = candidateEntry.get();
-                        var gridIndex = entry.getKey();
-                        var candidateIndices = entry.getValue().stream().findFirst();
-                        if (candidateIndices.isPresent()) {
-                            var candidateIndex = candidateIndices.get();
+                for (var entry : candidateCount.entrySet()) {
+                    var gridIndex = entry.getKey();
+                    for (var candidateIndices : entry.getValue()) {
+                        for (var candidateIndex : candidateIndices.getValue()) {
                             var gridCopy = grid.set(gridIndex, candidateIndex);
-                            return solve(gridCopy);
+                            var solution = solve(gridCopy);
+                            if (solution.isPresent()) {
+                                return solution;
+                            }
                         }
                     }
                 }
