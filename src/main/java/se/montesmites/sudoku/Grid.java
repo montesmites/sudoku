@@ -7,71 +7,49 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static java.util.Map.Entry.comparingByKey;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
+import static java.util.stream.Stream.generate;
 
 class Grid {
-    private static class ClueProviderDeployer {
-        private final Context context;
-        private final IndexConverter converter;
-        private BitVector solution;
-        private List<BitVector> candidates;
-
-        ClueProviderDeployer(Context context, IndexConverter converter, ClueProvider clueProvider) {
-            this.context = context;
-            this.converter = converter;
-            deployClues(clueProvider);
+    static Grid of(List<String> rows) {
+        var order = (int) Math.sqrt(rows.size());
+        var side = rows.size();
+        var area = side * side;
+        var converter = new IndexConverter(order);
+        var solution = BitVector.of(area);
+        var candidates = generate(() -> BitVector.of(area)).limit(side).collect(toList());
+        if (side != 1 && side != 4 && side != 9) {
+            throw new IllegalArgumentException("There must be 1, 4 och 9 rows.");
         }
-
-        private void deployClues(ClueProvider clueProvider) {
-            if (clueProvider.stream().count() > 0) {
-                this.solution = BitVector.of(
-                        context.getArea(),
-                        clueProvider.stream().map(cell -> converter.indexAt(cell.getRow(), cell.getCol())));
-                var candidatesClues = clueProvider.stream().collect(groupingBy(cell -> cell.getClue() - 1));
-                this.candidates = candidatesClues.entrySet()
-                                                 .stream()
-                                                 .sorted(comparingByKey())
-                                                 .map(entry -> candidatesClues.get(entry.getKey()))
-                                                 .map(cells -> cells.stream().map(cell -> converter.indexAt(cell.getRow(), cell.getCol())))
-                                                 .map(indices -> BitVector.of(context.getSide(), indices))
-                                                 .collect(toList());
-            } else {
-                this.solution = BitVector.of(context.getArea());
-                this.candidates = Stream.generate(() -> BitVector.of(context.getArea())).limit(context.getSide()).collect(toList());
+        for (int row = 0; row < rows.size(); row++) {
+            var line = rows.get(row);
+            if (line.length() != side) {
+                throw new IllegalArgumentException("Each row must have the same number of positions as there are rows.");
+            }
+            for (int col = 0; col < line.length(); col++) {
+                var clueChar = line.charAt(col);
+                if (Character.isDigit(clueChar)) {
+                    var index = converter.indexAt(row, col);
+                    var clue = Character.getNumericValue(clueChar);
+                    if (clue > 0 && clue <= side) {
+                        var candidate = candidates.get(clue - 1);
+                        solution = solution.set(index);
+                        candidate = candidate.set(index);
+                        candidates.set(clue - 1, candidate);
+                    }
+                }
             }
         }
-
-        BitVector getSolution() {
-            return solution;
-        }
-
-        List<BitVector> getCandidates() {
-            return candidates;
-        }
+        return new Grid(new Context(order), converter, solution, candidates);
     }
 
     private final Context context;
     private final IndexConverter converter;
     private final BitVector solution;
     private final List<BitVector> candidates;
-
-    Grid(Context context) {
-        this(context, new IndexConverter(context.getOrder()));
-    }
-
-    private Grid(Context context, IndexConverter converter) {
-        this(context, converter, new ClueProviderDeployer(context, converter, context.getClueProvider()));
-    }
-
-    private Grid(Context context, IndexConverter converter, ClueProviderDeployer deployer) {
-        this.context = context;
-        this.converter = converter;
-        this.solution = deployer.getSolution();
-        this.candidates = deployer.getCandidates();
-    }
 
     private Grid(Context context, IndexConverter converter, BitVector solution, List<BitVector> candidates) {
         this.context = context;
@@ -80,15 +58,7 @@ class Grid {
         this.candidates = candidates;
     }
 
-    Context getContext() {
-        return context;
-    }
-
-    Optional<Integer> getValueAt(int row, int col) {
-        return getValueAt(converter.indexAt(row, col));
-    }
-
-    private Optional<Integer> getValueAt(int index) {
+    Optional<Integer> getSymbolAt(int index) {
         for (int i = 0; i < context.getSide(); i++) {
             if (candidates.get(i).isSet(index)) {
                 return Optional.of(i + 1);
@@ -119,8 +89,7 @@ class Grid {
     Map<Integer, List<Integer>> candidateIndicesByIndex() {
         return unsolvedIndices()
                 .map(index -> new IndexedCandidates(index, availableCandidatesAt(index)))
-                .collect(toMap(IndexedCandidates::getIndex, IndexedCandidates::getCandidates))
-                ;
+                .collect(toMap(IndexedCandidates::getIndex, IndexedCandidates::getCandidates));
     }
 
     Grid copy() {
@@ -153,5 +122,17 @@ class Grid {
         List<Integer> getCandidates() {
             return candidates;
         }
+    }
+
+    boolean isEquivalent(Grid that) {
+        if (this.context.getOrder() == that.context.getOrder()) {
+            for (int index = 0; index < this.context.getArea(); index++) {
+                if (!this.getSymbolAt(index).equals(that.getSymbolAt(index))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }

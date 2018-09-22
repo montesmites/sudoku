@@ -16,10 +16,6 @@ public class BitVector {
         return new BitVector(size, bitSet);
     }
 
-    public static BitVector of(int size, Stream<Integer> indices) {
-        return BitVector.of(size, indices.mapToInt(Integer::intValue));
-    }
-
     private final int size;
     private final BitSet bitSet;
 

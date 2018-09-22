@@ -12,10 +12,11 @@ import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GridTest {
+    private final static List<String> EMPTY_1x1 = List.of(" ");
+
     @Test
     void availableCandidates_1x1WithNoClues() {
-        var context = new Context(1, ClueProvider.empty(1));
-        var grid = new Grid(context);
+        var grid = Grid.of(EMPTY_1x1);
         var exp = Set.of(0);
         var act = new HashSet<>(grid.availableCandidatesAt(0));
         assertEquals(exp, act);
@@ -23,8 +24,7 @@ class GridTest {
 
     @Test
     void unsolvedIndices_1x1WithNoClues() {
-        var context = new Context(1, ClueProvider.empty(1));
-        var grid = new Grid(context);
+        var grid = Grid.of(EMPTY_1x1);
         var exp = Set.of(0);
         var act = grid.unsolvedIndices().collect(toSet());
         assertEquals(exp, act);
@@ -32,8 +32,7 @@ class GridTest {
 
     @Test
     void candidateIndicesByIndex_1x1WithNoClues() {
-        var context = new Context(1, ClueProvider.empty(1));
-        var grid = new Grid(context);
+        var grid = Grid.of(EMPTY_1x1);
         var exp = Map.of(0, List.of(0))
                      .entrySet().stream()
                      .collect(toMap(Map.Entry::getKey, entry -> new HashSet<>(entry.getValue())));
