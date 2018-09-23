@@ -42,22 +42,24 @@ public class Grid {
                 }
             }
         }
-        return new Grid(new Context(order), converter, solution, candidates);
+        return new Grid(new Context(order), converter, new Neighbourhood(order), solution, candidates);
     }
 
     private final Context context;
     private final IndexConverter converter;
+    private final Neighbourhood neighbourhood;
     private final BitVector solution;
     private final List<BitVector> candidates;
 
-    private Grid(Context context, IndexConverter converter, BitVector solution, List<BitVector> candidates) {
+    private Grid(Context context, IndexConverter converter, Neighbourhood neighbourhood, BitVector solution, List<BitVector> candidates) {
         this.context = context;
         this.converter = converter;
+        this.neighbourhood = neighbourhood;
         this.solution = solution;
         this.candidates = candidates;
     }
 
-    Optional<Integer> getSymbolAt(int index) {
+    private Optional<Integer> getSymbolAt(int index) {
         for (int i = 0; i < context.getSide(); i++) {
             if (candidates.get(i).isSet(index)) {
                 return Optional.of(i + 1);
@@ -89,10 +91,12 @@ public class Grid {
                 .collect(toMap(IndexedCandidates::getIndex, IndexedCandidates::getCandidates));
     }
 
-    Grid copy() {
-        var solution = this.solution.copy();
-        var candidates = this.candidates.stream().map(BitVector::copy).collect(toList());
-        return new Grid(context, converter, solution, candidates);
+    Grid unset(int index) {
+        var solution = this.solution.unset(index);
+        var candidates = range(0, context.getSide())
+                .mapToObj(i -> this.candidates.get(i).unset(index))
+                .collect(toList());
+        return new Grid(context, converter, neighbourhood, solution, candidates);
     }
 
     Grid set(int gridIndex, int candidateIndex) {
@@ -100,7 +104,7 @@ public class Grid {
         var candidates = range(0, context.getSide())
                 .mapToObj(i -> i == candidateIndex ? this.candidates.get(i).set(gridIndex) : this.candidates.get(i))
                 .collect(toList());
-        return new Grid(context, converter, solution, candidates);
+        return new Grid(context, converter, neighbourhood, solution, candidates);
     }
 
     private class IndexedCandidates {
@@ -131,5 +135,42 @@ public class Grid {
             return true;
         }
         return false;
+    }
+
+    boolean isASolutionTo(Grid that) {
+        if (this.context.getOrder() == that.context.getOrder()) {
+            for (int index = 0; index < this.context.getArea(); index++) {
+                if (that.getSymbolAt(index).isPresent() && !that.getSymbolAt(index).equals(this.getSymbolAt(index))) {
+                    return false;
+                }
+            }
+            if (this.solution.cardinality() == context.getArea()) {
+                for (BitVector candidate : candidates) {
+                    if (candidate.cardinality() != context.getSide()) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    String render() {
+        var grid = new StringBuilder();
+        for (int row = 0; row < context.getSide(); row++) {
+            var line = new StringBuilder();
+            for (int col = 0; col < context.getSide(); col++) {
+                int index = converter.indexAt(row, col);
+                var symbol = getSymbolAt(index).map(s -> Integer.toString(s)).orElse(" ");
+                line.append(symbol);
+            }
+            grid.append(line).append("\n");
+        }
+        return grid.toString();
     }
 }

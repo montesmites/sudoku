@@ -13,12 +13,18 @@
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven.surefire.plugin.version>2.19</maven.surefire.plugin.version>
 
+        <logback.version>1.2.3</logback.version>
         <lombok.version>1.18.2</lombok.version>
 
         <junit.version>5.0.2</junit.version>
         <junit.platform.surefire.provider.version>1.0.2</junit.platform.surefire.provider.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>

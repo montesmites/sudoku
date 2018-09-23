@@ -32,10 +32,6 @@ public class BitVector {
         return bitSet.get(index);
     }
 
-    public BitVector copy() {
-        return new BitVector(size, (BitSet) bitSet.clone());
-    }
-
     public BitVector not() {
         BitSet copy = (BitSet) bitSet.clone();
         copy.flip(0, size);
@@ -59,6 +55,12 @@ public class BitVector {
     public BitVector set(int index) {
         BitSet copy = (BitSet) bitSet.clone();
         copy.set(index);
+        return new BitVector(size, copy);
+    }
+
+    public BitVector unset(int index) {
+        BitSet copy = (BitSet) bitSet.clone();
+        copy.clear(index);
         return new BitVector(size, copy);
     }
 
