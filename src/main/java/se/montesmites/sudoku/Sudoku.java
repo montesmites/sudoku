@@ -4,9 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import static java.util.Map.Entry.comparingByKey;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.groupingBy;
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
 class Sudoku {
@@ -31,33 +29,22 @@ class Sudoku {
         if (grid.isSolved()) {
             return Optional.of(grid);
         } else {
-            var candidateCount = grid.candidateIndicesByIndex().entrySet().stream()
-                                     .collect(groupingBy(entry -> entry.getValue().size()));
-            if (candidateCount.containsKey(0)) {
+            var candidatesPerIndex = grid.candidatesPerIndex().stream()
+                                         .sorted(comparing(i -> i.getCandidateIndices().size()))
+                                         .collect(toList());
+            if (candidatesPerIndex.get(0).getCandidateIndices().isEmpty()) {
                 return Optional.empty();
             } else {
-                var selectedGridIndexWithCandidates
-                        = candidateCount.keySet().stream()
-                                        .sorted()
-                                        .findFirst()
-                                        .map(candidateCount::get)
-                                        .map(entries -> entries.stream().min(comparingByKey()))
-                                        .flatMap(identity());
-                if (selectedGridIndexWithCandidates.isPresent()) {
-                    var gridIndex = selectedGridIndexWithCandidates.get().getKey();
-                    var candidateIndices = selectedGridIndexWithCandidates.get().getValue();
-                    for (var candidateIndex : candidateIndices) {
-                        var gridCopy = grid.set(gridIndex, candidateIndex);
-                        var solution = doSolve(depth + 1, gridCopy);
-                        if (solution.isPresent()) {
-                            return solution;
-                        }
+                for (var candidateIndex : candidatesPerIndex.get(0).getCandidateIndices()) {
+                    var gridCopy = grid.set(candidatesPerIndex.get(0).getGridIndex(), candidateIndex);
+                    var solution = doSolve(depth + 1, gridCopy);
+                    if (solution.isPresent()) {
+                        return solution;
                     }
-                    return Optional.empty();
-                } else {
-                    return Optional.empty();
                 }
+                return Optional.empty();
             }
         }
     }
 }
+

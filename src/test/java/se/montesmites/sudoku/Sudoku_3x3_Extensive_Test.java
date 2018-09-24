@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-class Sudoku_3x3_Test {
+class Sudoku_3x3_Extensive_Test {
     @TestFactory
     Stream<DynamicTest> easy() {
         return generate(Sudoku_3x3.EASY);

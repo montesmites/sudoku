@@ -1,14 +1,13 @@
 package se.montesmites.sudoku;
 
 import se.montesmites.sudoku.immutable.BitVector;
+import se.montesmites.sudoku.model.GridIndexCandidateIndices;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 import static java.util.stream.Stream.generate;
 
@@ -85,10 +84,10 @@ public class Grid {
                 .collect(toList());
     }
 
-    Map<Integer, List<Integer>> candidateIndicesByIndex() {
+    List<GridIndexCandidateIndices> candidatesPerIndex() {
         return unsolvedIndices()
-                .map(index -> new IndexedCandidates(index, availableCandidatesAt(index)))
-                .collect(toMap(IndexedCandidates::getIndex, IndexedCandidates::getCandidates));
+                .map(index -> new GridIndexCandidateIndices(index, availableCandidatesAt(index)))
+                .collect(toList());
     }
 
     Grid unset(int index) {
@@ -105,24 +104,6 @@ public class Grid {
                 .mapToObj(i -> i == candidateIndex ? this.candidates.get(i).set(gridIndex) : this.candidates.get(i))
                 .collect(toList());
         return new Grid(context, converter, neighbourhood, solution, candidates);
-    }
-
-    private class IndexedCandidates {
-        private final int index;
-        private final List<Integer> candidates;
-
-        IndexedCandidates(int index, List<Integer> candidates) {
-            this.index = index;
-            this.candidates = candidates;
-        }
-
-        int getIndex() {
-            return index;
-        }
-
-        List<Integer> getCandidates() {
-            return candidates;
-        }
     }
 
     boolean isEquivalent(Grid that) {
