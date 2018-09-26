@@ -5,14 +5,21 @@ import se.montesmites.sudoku.model.GridIndexCandidateIndices;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
+import static java.util.Comparator.comparing;
+import static java.util.List.copyOf;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
+import static java.util.stream.IntStream.rangeClosed;
 import static java.util.stream.Stream.generate;
 
 public class Grid {
     public static Grid of(List<String> rows) {
+        return Grid.of(rows, copyOf(rangeClosed(1, rows.size()).mapToObj(String::valueOf).collect(toList())));
+    }
+
+    private static Grid of(List<String> rows, List<String> symbols) {
         var order = (int) Math.sqrt(rows.size());
         var side = rows.size();
         var area = side * side;
@@ -41,7 +48,7 @@ public class Grid {
                 }
             }
         }
-        return new Grid(new Context(order), converter, new Neighbourhood(order), solution, candidates);
+        return new Grid(new Context(order, symbols), converter, new Neighbourhood(order), solution, candidates);
     }
 
     private final Context context;
@@ -58,10 +65,10 @@ public class Grid {
         this.candidates = candidates;
     }
 
-    private Optional<Integer> getSymbolAt(int index) {
+    private Optional<String> getSymbolAt(int index) {
         for (int i = 0; i < context.getSide(); i++) {
             if (candidates.get(i).isSet(index)) {
-                return Optional.of(i + 1);
+                return Optional.of(context.getSymbols().get(i));
             }
         }
         return Optional.empty();
@@ -71,23 +78,22 @@ public class Grid {
         return solution.cardinality() >= context.getArea();
     }
 
-    Stream<Integer> unsolvedIndices() {
+    IntStream unsolvedIndices() {
         return solution.not().setIndices();
     }
 
-    List<Integer> availableCandidatesAt(int index) {
-        final var neighbourhood = new Neighbourhood(context.getOrder());
+    int[] availableCandidatesAt(int index) {
         final var neighbours = BitVector.of(context.getArea(), neighbourhood.neighbourhoodOf(index));
         return range(0, context.getSide())
                 .filter(i -> candidates.get(i).and(neighbours).isEmpty())
-                .boxed()
-                .collect(toList());
+                .toArray();
     }
 
-    List<GridIndexCandidateIndices> candidatesPerIndex() {
+    GridIndexCandidateIndices nextEmptyGridIndexCandidateIndices() {
         return unsolvedIndices()
-                .map(index -> new GridIndexCandidateIndices(index, availableCandidatesAt(index)))
-                .collect(toList());
+                .mapToObj(index -> new GridIndexCandidateIndices(index, availableCandidatesAt(index)))
+                .min(comparing(i -> i.getCandidateIndices().length))
+                .orElseThrow();
     }
 
     Grid unset(int index) {
@@ -147,7 +153,7 @@ public class Grid {
             var line = new StringBuilder();
             for (int col = 0; col < context.getSide(); col++) {
                 int index = converter.indexAt(row, col);
-                var symbol = getSymbolAt(index).map(s -> Integer.toString(s)).orElse(" ");
+                var symbol = getSymbolAt(index).orElse(" ");
                 line.append(symbol);
             }
             grid.append(line).append("\n");

@@ -2,7 +2,6 @@ package se.montesmites.sudoku.immutable;
 
 import java.util.BitSet;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class BitVector {
     public static BitVector of(int size) {
@@ -48,8 +47,8 @@ public class BitVector {
         return bitSet.isEmpty();
     }
 
-    public Stream<Integer> setIndices() {
-        return bitSet.stream().boxed();
+    public IntStream setIndices() {
+        return bitSet.stream();
     }
 
     public BitVector set(int index) {

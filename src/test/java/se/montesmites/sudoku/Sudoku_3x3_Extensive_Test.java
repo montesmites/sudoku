@@ -43,7 +43,7 @@ class Sudoku_3x3_Extensive_Test {
         var name = sudoku.name();
         tests.add(test(name + " – ALREADY SOLVED", sudoku.solved()));
         var grid = sudoku.solved();
-        var unsolvedIndices = sudoku.unsolved().unsolvedIndices().collect(toList());
+        var unsolvedIndices = sudoku.unsolved().unsolvedIndices().boxed().collect(toList());
         for (int index = 0; index < unsolvedIndices.size(); index++) {
             grid = grid.unset(unsolvedIndices.get(index));
             tests.add(test(String.format("%s – %d unknown(s)", name, index + 1), grid));
