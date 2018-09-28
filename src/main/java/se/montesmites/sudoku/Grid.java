@@ -1,8 +1,14 @@
 package se.montesmites.sudoku;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.NonNull;
 import se.montesmites.sudoku.immutable.BitVector;
 import se.montesmites.sudoku.model.GridIndexCandidateIndices;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -15,6 +21,21 @@ import static java.util.stream.IntStream.rangeClosed;
 import static java.util.stream.Stream.generate;
 
 public class Grid {
+    static Grid of(String json) {
+        try {
+            JsonGrid grid = new ObjectMapper()
+                    .readerFor(JsonGrid.class)
+                    .readValue(json);
+            if (grid.getSymbols() == null) {
+                return Grid.of(grid.getRows());
+            } else {
+                return Grid.of(grid.getRows(), grid.getSymbols());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Grid of(List<String> rows) {
         return Grid.of(rows, copyOf(rangeClosed(1, rows.size()).mapToObj(String::valueOf).collect(toList())));
     }
@@ -27,7 +48,7 @@ public class Grid {
         var solution = BitVector.of(area);
         var candidates = generate(() -> BitVector.of(area)).limit(side).collect(toList());
         if (side != 1 && side != 4 && side != 9) {
-            throw new IllegalArgumentException("There must be 1, 4 och 9 rows.");
+            throw new IllegalArgumentException("There must be 1, 4 or 9 rows.");
         }
         for (int row = 0; row < rows.size(); row++) {
             var line = rows.get(row);
@@ -49,6 +70,19 @@ public class Grid {
             }
         }
         return new Grid(new Context(order, symbols), converter, new Neighbourhood(order), solution, candidates);
+    }
+
+    private static class JsonGrid {
+        @Getter
+        private final List<String> symbols;
+        @Getter
+        private final List<String> rows;
+
+        @JsonCreator
+        private JsonGrid(@JsonProperty("symbols") String symbols, @NonNull @JsonProperty("grid") List<String> rows) {
+            this.symbols = symbols.chars().mapToObj(c -> String.valueOf((char) c)).collect(toList());
+            this.rows = rows;
+        }
     }
 
     private final Context context;

@@ -10,14 +10,16 @@
         <java.version>10</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>2.19</maven.surefire.plugin.version>
+        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>2.19</maven-surefire-plugin.version>
 
+        <fasterxml-jackson.version>2.9.7</fasterxml-jackson.version>
         <logback.version>1.2.3</logback.version>
         <lombok.version>1.18.2</lombok.version>
 
         <junit.version>5.0.2</junit.version>
-        <junit.platform.surefire.provider.version>1.0.2</junit.platform.surefire.provider.version>
+        <apiguardian-api.version>1.0.0</apiguardian-api.version>
+        <junit-platform-surefire-provider.version>1.0.2</junit-platform-surefire-provider.version>
     </properties>
     <dependencies>
         <dependency>
@@ -46,7 +48,7 @@
         <dependency>
             <groupId>org.apiguardian</groupId>
             <artifactId>apiguardian-api</artifactId>
-            <version>1.0.0</version>
+            <version>${apiguardian-api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -55,13 +57,18 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${fasterxml-jackson.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -72,7 +79,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.surefire.plugin.version}</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
                 </configuration>
@@ -80,7 +87,7 @@
                     <dependency>
                         <groupId>org.junit.platform</groupId>
                         <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>${junit.platform.surefire.provider.version}</version>
+                        <version>${junit-platform-surefire-provider.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
