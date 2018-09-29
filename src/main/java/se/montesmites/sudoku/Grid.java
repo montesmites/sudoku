@@ -40,7 +40,7 @@ public class Grid {
         var area = side * side;
         var converter = new IndexConverter(order);
         var solution = BitVector.of(area);
-        var candidates = generate(() -> BitVector.of(area)).limit(side).collect(toList());
+        var candidates = generate(() -> BitVector.of(area)).limit(side).toArray(BitVector[]::new);
         if (side != 1 && side != 4 && side != 9) {
             throw new IllegalArgumentException("There must be 1, 4 or 9 rows.");
         }
@@ -54,10 +54,10 @@ public class Grid {
                 var symbolIndex = symbols.indexOf(clueChar);
                 if (symbolIndex >= 0) {
                     var index = converter.indexAt(row, col);
-                    var candidate = candidates.get(symbolIndex);
+                    var candidate = candidates[symbolIndex];
                     solution = solution.set(index);
                     candidate = candidate.set(index);
-                    candidates.set(symbolIndex, candidate);
+                    candidates[symbolIndex] = candidate;
                 }
             }
         }
@@ -81,9 +81,9 @@ public class Grid {
     private final IndexConverter converter;
     private final Neighbourhood neighbourhood;
     private final BitVector solution;
-    private final List<BitVector> candidates;
+    private final BitVector[] candidates;
 
-    private Grid(Context context, IndexConverter converter, Neighbourhood neighbourhood, BitVector solution, List<BitVector> candidates) {
+    private Grid(Context context, IndexConverter converter, Neighbourhood neighbourhood, BitVector solution, BitVector[] candidates) {
         this.context = context;
         this.converter = converter;
         this.neighbourhood = neighbourhood;
@@ -93,7 +93,7 @@ public class Grid {
 
     private Optional<String> getSymbolAt(int index) {
         for (int i = 0; i < context.getSide(); i++) {
-            if (candidates.get(i).isSet(index)) {
+            if (candidates[i].isSet(index)) {
                 return Optional.of(context.getSymbols().get(i).toString());
             }
         }
@@ -111,7 +111,7 @@ public class Grid {
     int[] availableCandidatesAt(int index) {
         final var neighbours = BitVector.of(context.getArea(), neighbourhood.neighbourhoodOf(index));
         return range(0, context.getSide())
-                .filter(i -> candidates.get(i).and(neighbours).isEmpty())
+                .filter(i -> candidates[i].and(neighbours).isEmpty())
                 .toArray();
     }
 
@@ -125,16 +125,16 @@ public class Grid {
     Grid unset(int index) {
         var solution = this.solution.unset(index);
         var candidates = range(0, context.getSide())
-                .mapToObj(i -> this.candidates.get(i).unset(index))
-                .collect(toList());
+                .mapToObj(i -> this.candidates[i].unset(index))
+                .toArray(BitVector[]::new);
         return new Grid(context, converter, neighbourhood, solution, candidates);
     }
 
     Grid set(int gridIndex, int candidateIndex) {
         var solution = this.solution.set(gridIndex);
         var candidates = range(0, context.getSide())
-                .mapToObj(i -> i == candidateIndex ? this.candidates.get(i).set(gridIndex) : this.candidates.get(i))
-                .collect(toList());
+                .mapToObj(i -> i == candidateIndex ? this.candidates[i].set(gridIndex) : this.candidates[i])
+                .toArray(BitVector[]::new);
         return new Grid(context, converter, neighbourhood, solution, candidates);
     }
 
