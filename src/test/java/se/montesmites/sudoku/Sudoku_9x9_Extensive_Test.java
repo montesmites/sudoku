@@ -3,7 +3,7 @@ package se.montesmites.sudoku;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.Executable;
-import se.montesmites.sudoku.sample.Sudoku_3x3;
+import se.montesmites.sudoku.sample.Sudoku_9x9;
 
 import java.util.stream.Stream;
 
@@ -12,33 +12,33 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-class Sudoku_3x3_Extensive_Test {
+class Sudoku_9x9_Extensive_Test {
     @TestFactory
     Stream<DynamicTest> easy() {
-        return generate(Sudoku_3x3.EASY);
+        return generate(Sudoku_9x9.EASY);
     }
 
     @TestFactory
     Stream<DynamicTest> intermediate() {
-        return generate(Sudoku_3x3.INTERMEDIATE);
+        return generate(Sudoku_9x9.INTERMEDIATE);
     }
 
     @TestFactory
     Stream<DynamicTest> hard() {
-        return generate(Sudoku_3x3.HARD);
+        return generate(Sudoku_9x9.HARD);
     }
 
     @TestFactory
     Stream<DynamicTest> veryHard() {
-        return generate(Sudoku_3x3.VERY_HARD);
+        return generate(Sudoku_9x9.VERY_HARD);
     }
 
     @TestFactory
     Stream<DynamicTest> diabolical() {
-        return generate(Sudoku_3x3.DIABOLICAL);
+        return generate(Sudoku_9x9.DIABOLICAL);
     }
 
-    private Stream<DynamicTest> generate(Sudoku_3x3 sudoku) {
+    private Stream<DynamicTest> generate(Sudoku_9x9 sudoku) {
         Stream.Builder<DynamicTest> tests = Stream.builder();
         var name = sudoku.name();
         tests.add(test(name + " – ALREADY SOLVED", sudoku.solved()));

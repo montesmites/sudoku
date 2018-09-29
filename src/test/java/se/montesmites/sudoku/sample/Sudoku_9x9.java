@@ -5,7 +5,7 @@ import se.montesmites.sudoku.Grid;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public enum Sudoku_3x3 {
+public enum Sudoku_9x9 {
     EASY(List.of(
             "152489376",
             "739256841",
@@ -138,7 +138,7 @@ public enum Sudoku_3x3 {
     private final List<String> solved;
     private final List<String> unsolved;
 
-    Sudoku_3x3(List<String> solved, List<String> unsolved) {
+    Sudoku_9x9(List<String> solved, List<String> unsolved) {
         this.solved = solved;
         this.unsolved = unsolved;
     }

@@ -5,7 +5,7 @@ import se.montesmites.sudoku.Grid;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public enum Sudoku_2x2 {
+public enum Sudoku_4x4 {
     SOLVED(List.of(
             "1324",
             "2413",
@@ -64,7 +64,7 @@ public enum Sudoku_2x2 {
 
     private final List<String> rows;
 
-    Sudoku_2x2(List<String> rows) {
+    Sudoku_4x4(List<String> rows) {
         this.rows = rows;
     }
 
