@@ -1,10 +1,15 @@
 package se.montesmites.sudoku;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 
 class Sudoku {
+    private final static Logger LOGGER = LoggerFactory.getLogger(Sudoku.class);
+
     public static void main(String[] args) throws Exception {
         var path = Paths.get(args[0]);
         Sudoku sudoku = new Sudoku();
@@ -18,10 +23,11 @@ class Sudoku {
     }
 
     Optional<Grid> solve(Grid grid) {
-        return doSolve(grid);
+        return doSolve(1, grid);
     }
 
-    private Optional<Grid> doSolve(Grid grid) {
+    private Optional<Grid> doSolve(int depth, Grid grid) {
+        LOGGER.trace("Depth {}", depth);
         if (grid.isSolved()) {
             return Optional.of(grid);
         } else {
@@ -33,7 +39,7 @@ class Sudoku {
             } else {
                 for (var candidateIndex : candidateIndices) {
                     var gridCopy = grid.set(gridIndex, candidateIndex);
-                    var solution = doSolve(gridCopy);
+                    var solution = doSolve(depth + 1, gridCopy);
                     if (solution.isPresent()) {
                         return solution;
                     }

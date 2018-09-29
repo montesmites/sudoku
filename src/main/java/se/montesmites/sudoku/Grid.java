@@ -41,8 +41,8 @@ public class Grid {
         var converter = new IndexConverter(order);
         var solution = BitVector.of(area);
         var candidates = generate(() -> BitVector.of(area)).limit(side).toArray(BitVector[]::new);
-        if (side != 1 && side != 4 && side != 9) {
-            throw new IllegalArgumentException("There must be 1, 4 or 9 rows.");
+        if (side != 1 && side != 4 && side != 9 && side != 16) {
+            throw new IllegalArgumentException("There must be 1, 4, 9 or 16 rows.");
         }
         for (int row = 0; row < rows.size(); row++) {
             var line = rows.get(row);
@@ -172,7 +172,6 @@ public class Grid {
         }
     }
 
-    @SuppressWarnings("unused")
     String render() {
         var grid = new StringBuilder();
         for (int row = 0; row < context.getSide(); row++) {
