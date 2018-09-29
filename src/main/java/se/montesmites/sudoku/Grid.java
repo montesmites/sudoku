@@ -12,8 +12,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static java.util.stream.Stream.generate;
@@ -183,6 +185,31 @@ public class Grid {
             }
             grid.append(line).append("\n");
         }
+        return grid.toString();
+    }
+
+    String prettyRender() {
+        var grid = new StringBuilder();
+        var boxVerticalBorder = Stream.generate(() -> "-").limit(context.getOrder()).collect(joining());
+        var rowVerticalBorder = Stream.generate(() -> boxVerticalBorder).limit(context.getOrder()).collect(joining("+", "\n+", "+\n"));
+        for (int row1 = 0; row1 < context.getOrder(); row1++) {
+            grid.append(rowVerticalBorder);
+            for (int row2 = 0; row2 < context.getOrder(); row2++) {
+                int row = row1 * context.getOrder() + row2;
+                for (int col1 = 0; col1 < context.getOrder(); col1++) {
+                    grid.append("|");
+                    for (int col2 = 0; col2 < context.getOrder(); col2++) {
+                        int col = col1 * context.getOrder() + col2;
+                        grid.append(this.getSymbolAt(converter.indexAt(row, col)).orElse(" "));
+                    }
+                }
+                grid.append("|");
+                if (row2 != context.getOrder() - 1) {
+                    grid.append("\n");
+                }
+            }
+        }
+        grid.append(rowVerticalBorder);
         return grid.toString();
     }
 }

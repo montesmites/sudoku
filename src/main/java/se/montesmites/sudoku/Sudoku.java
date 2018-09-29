@@ -27,7 +27,7 @@ class Sudoku {
     }
 
     private Optional<Grid> doSolve(int depth, Grid grid) {
-        LOGGER.trace("Depth {}", depth);
+        LOGGER.trace("Depth is {}, grid is {}", depth, grid.prettyRender());
         if (grid.isSolved()) {
             return Optional.of(grid);
         } else {

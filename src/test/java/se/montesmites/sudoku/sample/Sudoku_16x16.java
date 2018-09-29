@@ -40,6 +40,41 @@ public enum Sudoku_16x16 {
             " 3 5E   D   B   ",
             "0 7D 43 BC68FE  ",
             "  F8B96C  E  7  "
+    )),
+    INTERMEDIATE(List.of(
+            "4E258CD76B9F301A",
+            "170829EA345CFBD6",
+            "CB63015F7D2A8E94",
+            "DA9F643B081E572C",
+            "3FDAE06C1578B249",
+            "08C27FA9BE64153D",
+            "6157B24DC3F9EA08",
+            "E4B9158320AD6FC7",
+            "A0FD58B69C4271E3",
+            "B24ED7C15A36098F",
+            "9531AEF0D78B4C62",
+            "768C9324EF01AD5B",
+            "8CE43D72A1B096F5",
+            "597BF61E82D3C4A0",
+            "FDA0CB9846E52371",
+            "23164A05F9C7D8BE"
+    ), List.of(
+            "4    CD 6  F   A",
+            "1      A 45   D ",
+            " B      7   8 9 ",
+            "  9 6 3   1 5  C",
+            "   AE0  1 7   4 ",
+            "0  2   9BE  1   ",
+            "6      D 3     8",
+            "  B9158  0AD  C7",
+            "A    8B      1E ",
+            "B  E 7    36 9  ",
+            " 5 1 E         2",
+            " 6 C  24        ",
+            " CE  D 2A B0 6 5",
+            "  7B  1  2D3 4  ",
+            "FD     84    37 ",
+            " 3     5F9     E"
     ));
 
     private final static String SYMBOLS = "0123456789ABCDEF";
