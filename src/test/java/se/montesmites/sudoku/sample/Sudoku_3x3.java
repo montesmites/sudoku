@@ -133,6 +133,8 @@ public enum Sudoku_3x3 {
             " 9    4  "
     ));
 
+    private final static String SYMBOLS = "123456789";
+
     private final List<String> solved;
     private final List<String> unsolved;
 
@@ -142,10 +144,10 @@ public enum Sudoku_3x3 {
     }
 
     public Grid solved() {
-        return Grid.of(solved);
+        return Grid.of(solved, SYMBOLS);
     }
 
     public Grid unsolved() {
-        return Grid.of(unsolved);
+        return Grid.of(unsolved, SYMBOLS);
     }
 }

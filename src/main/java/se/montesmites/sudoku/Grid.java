@@ -14,10 +14,8 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static java.util.Comparator.comparing;
-import static java.util.List.copyOf;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
-import static java.util.stream.IntStream.rangeClosed;
 import static java.util.stream.Stream.generate;
 
 public class Grid {
@@ -26,21 +24,17 @@ public class Grid {
             JsonGrid grid = new ObjectMapper()
                     .readerFor(JsonGrid.class)
                     .readValue(json);
-            if (grid.getSymbols() == null) {
-                return Grid.of(grid.getRows());
-            } else {
-                return Grid.of(grid.getRows(), grid.getSymbols());
-            }
+            return Grid.of(grid.getRows(), grid.getSymbols());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Grid of(List<String> rows) {
-        return Grid.of(rows, copyOf(rangeClosed(1, rows.size()).mapToObj(String::valueOf).collect(toList())));
+    public static Grid of(List<String> rows, String symbols) {
+        return Grid.of(rows, symbols.chars().mapToObj(c -> (char) c).collect(toList()));
     }
 
-    private static Grid of(List<String> rows, List<String> symbols) {
+    private static Grid of(List<String> rows, List<Character> symbols) {
         var order = (int) Math.sqrt(rows.size());
         var side = rows.size();
         var area = side * side;
@@ -57,15 +51,13 @@ public class Grid {
             }
             for (int col = 0; col < line.length(); col++) {
                 var clueChar = line.charAt(col);
-                if (Character.isDigit(clueChar)) {
+                var symbolIndex = symbols.indexOf(clueChar);
+                if (symbolIndex >= 0) {
                     var index = converter.indexAt(row, col);
-                    var clue = Character.getNumericValue(clueChar);
-                    if (clue > 0 && clue <= side) {
-                        var candidate = candidates.get(clue - 1);
-                        solution = solution.set(index);
-                        candidate = candidate.set(index);
-                        candidates.set(clue - 1, candidate);
-                    }
+                    var candidate = candidates.get(symbolIndex);
+                    solution = solution.set(index);
+                    candidate = candidate.set(index);
+                    candidates.set(symbolIndex, candidate);
                 }
             }
         }
@@ -74,13 +66,13 @@ public class Grid {
 
     private static class JsonGrid {
         @Getter
-        private final List<String> symbols;
+        private final List<Character> symbols;
         @Getter
         private final List<String> rows;
 
         @JsonCreator
-        private JsonGrid(@JsonProperty("symbols") String symbols, @NonNull @JsonProperty("grid") List<String> rows) {
-            this.symbols = symbols.chars().mapToObj(c -> String.valueOf((char) c)).collect(toList());
+        private JsonGrid(@NonNull @JsonProperty("symbols") String symbols, @NonNull @JsonProperty("grid") List<String> rows) {
+            this.symbols = symbols.chars().mapToObj(c -> (char) c).collect(toList());
             this.rows = rows;
         }
     }
@@ -102,7 +94,7 @@ public class Grid {
     private Optional<String> getSymbolAt(int index) {
         for (int i = 0; i < context.getSide(); i++) {
             if (candidates.get(i).isSet(index)) {
-                return Optional.of(context.getSymbols().get(i));
+                return Optional.of(context.getSymbols().get(i).toString());
             }
         }
         return Optional.empty();

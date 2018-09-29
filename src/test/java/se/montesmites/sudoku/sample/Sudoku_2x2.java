@@ -69,6 +69,6 @@ public enum Sudoku_2x2 {
     }
 
     public Grid grid() {
-        return Grid.of(rows);
+        return Grid.of(rows, "1234");
     }
 }

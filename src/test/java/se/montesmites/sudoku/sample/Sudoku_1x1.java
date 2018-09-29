@@ -20,6 +20,6 @@ public enum Sudoku_1x1 {
     }
 
     public Grid grid() {
-        return Grid.of(rows);
+        return Grid.of(rows, "1");
     }
 }
