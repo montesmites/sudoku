@@ -11,15 +11,18 @@ class Sudoku {
     private final static Logger LOGGER = LoggerFactory.getLogger(Sudoku.class);
 
     public static void main(String[] args) throws Exception {
+        var start = System.currentTimeMillis();
         var path = Paths.get(args[0]);
         Sudoku sudoku = new Sudoku();
         var solution = sudoku.solve(Grid.of(new String(Files.readAllBytes(path))));
         if (solution.isPresent()) {
             System.out.println("The solution is:");
-            System.out.println(solution.get().render());
+            System.out.println(solution.get().prettyRender());
         } else {
             System.out.println("There is no solution.");
         }
+        var finish = System.currentTimeMillis();
+        System.out.println("Solve time: " + (finish - start) + " ms");
     }
 
     Optional<Grid> solve(Grid grid) {
