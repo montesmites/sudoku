@@ -16,7 +16,6 @@
 
         <fasterxml-jackson.version>2.9.7</fasterxml-jackson.version>
         <logback.version>1.2.3</logback.version>
-        <lombok.version>1.18.2</lombok.version>
 
         <junit.version>5.0.2</junit.version>
         <apiguardian-api.version>1.0.0</apiguardian-api.version>
@@ -51,12 +50,6 @@
             <artifactId>apiguardian-api</artifactId>
             <version>${apiguardian-api.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

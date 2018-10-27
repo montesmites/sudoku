@@ -3,8 +3,6 @@ package se.montesmites.sudoku;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-import lombok.NonNull;
 import se.montesmites.sudoku.immutable.BitVector;
 import se.montesmites.sudoku.model.GridIndexCandidateIndices;
 
@@ -67,15 +65,21 @@ public class Grid {
     }
 
     private static class JsonGrid {
-        @Getter
         private final List<Character> symbols;
-        @Getter
         private final List<String> rows;
 
         @JsonCreator
-        private JsonGrid(@NonNull @JsonProperty("symbols") String symbols, @NonNull @JsonProperty("grid") List<String> rows) {
+        private JsonGrid(@JsonProperty("symbols") String symbols, @JsonProperty("grid") List<String> rows) {
             this.symbols = symbols.chars().mapToObj(c -> (char) c).collect(toList());
             this.rows = rows;
+        }
+
+        private List<Character> getSymbols() {
+            return symbols;
+        }
+
+        private List<String> getRows() {
+            return rows;
         }
     }
 
